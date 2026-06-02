@@ -1,0 +1,83 @@
+/* ZoningMap.css — Stone · Forest · Copper theme */
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Spinner for light backgrounds (panel) */
+.spin {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1.5px solid var(--color-border);
+  border-top-color: var(--color-forest-deep);
+  animation: spin 0.75s linear infinite;
+  flex-shrink: 0;
+}
+
+/* Spinner for search bar */
+.spin-sm {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1.5px solid var(--color-border);
+  border-top-color: var(--color-forest);
+  animation: spin 0.75s linear infinite;
+  flex-shrink: 0;
+}
+
+/* Panel scrollbar */
+.panel-scroll::-webkit-scrollbar { width: 5px; }
+.panel-scroll::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 10px; }
+.panel-scroll::-webkit-scrollbar-track { background: var(--color-bg-surface); }
+
+/* Chat scrollbar */
+.chat-scroll::-webkit-scrollbar { width: 3px; }
+.chat-scroll::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 10px; }
+.chat-scroll::-webkit-scrollbar-track { background: transparent; }
+
+/* Push MapLibre nav controls below the search bar */
+.maplibregl-ctrl-top-right {
+  top: 64px !important;
+  right: 12px !important;
+}
+.maplibregl-ctrl-bottom-left {
+  bottom: 44px !important;
+  left: 12px !important;
+}
+
+/* Light-theme attribution */
+.maplibregl-ctrl-attrib {
+  background: rgba(248, 246, 243, 0.85) !important;
+  color: var(--color-text-hint) !important;
+  font-size: 9px !important;
+}
+.maplibregl-ctrl-attrib a {
+  color: var(--color-text-muted) !important;
+}
+
+/* Nav control light style */
+.maplibregl-ctrl-group {
+  background: #FFFFFF !important;
+  border: 1px solid var(--color-border) !important;
+  box-shadow: none !important;
+  border-radius: var(--radius-md) !important;
+}
+.maplibregl-ctrl-group button {
+  background-color: transparent !important;
+  color: var(--color-text-muted) !important;
+}
+.maplibregl-ctrl-group button:hover {
+  background-color: var(--color-bg-surface) !important;
+  color: var(--color-forest-deep) !important;
+}
+.maplibregl-ctrl-icon {
+  filter: none;
+  opacity: 0.6;
+}
+
+/* Global scrollbar */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: var(--color-bg-surface); }
+::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-border-strong); }

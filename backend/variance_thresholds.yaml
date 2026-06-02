@@ -1,0 +1,35 @@
+# Minor variance tolerance thresholds — Toronto Committee of Adjustment (CoA) practice.
+# These are typical (not guaranteed) CoA tolerances based on published decisions.
+# A "variance" status means the value exceeds the by-law limit but is within CoA range.
+# A "violation" status means it exceeds both the limit and the CoA tolerance.
+#
+# All values are the maximum allowable deviation from the by-law limit.
+# e.g. front_yard_setback_m: 0.5 means you can be 0.5 m short of the required minimum
+# and still be classified as "variance" (rather than "violation").
+
+building_envelope:
+  front_yard_setback_m: 0.50    # m below minimum — typical CoA tolerance
+  rear_yard_setback_m:  0.50    # m below minimum
+  side_yard_setback_m:  0.15    # m below minimum (tight tolerance, structural impact)
+  building_height_max_m: 0.50   # m above maximum
+  building_depth_m:     0.50    # m above maximum
+  main_wall_height_side_m: 0.30
+  main_wall_height_frontrear_m: 0.30
+
+density:
+  fsi_max: 0.10                 # FSI above cap
+  lot_coverage_pct: 3.00        # percentage points above maximum
+  dwelling_unit_count: 0        # no minor variance for unit count (requires ZBA)
+
+landscape:
+  front_yard_landscaping_pct: 5.0   # % below minimum
+  front_yard_soft_landscaping_pct: 5.0
+
+parking:
+  parking_spaces_residents: 0   # integer — no fractional spaces
+  parking_spaces_visitor:   0
+
+projections:
+  eaves_max_into_side_m:   0.1
+  rear_deck_ground_encroachment_m: 0.20
+  rear_deck_upper_encroachment_m:  0.10

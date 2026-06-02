@@ -1,0 +1,112 @@
+# Toronto Zoning By-law 569-2013 — Unconsolidated Amendments
+# Update this file when the City posts a new office consolidation.
+# Last updated: 2026-05-27
+#
+# Each entry:
+#   id:        By-law number
+#   summary:   One-line plain-English description
+#   affects:   List of parameter keys this amendment touches
+#   scope:     "citywide" | "ward:<n>" | "district:<name>"
+#   in_force:  ISO date the amendment took legal effect
+#   consolidated: true/false — whether the 2024 office consolidation includes this
+
+amendments:
+  - id: "474-2023"
+    summary: "Permits 1–4 dwelling units as-of-right in all residential zones citywide"
+    affects: [dwelling_unit_count, multiplex_fsi_exempt, building_height_max_m]
+    scope: citywide
+    in_force: "2024-01-30"
+    consolidated: false
+    details: >
+      Residential zones (R, RD, RS, RT, RM) may have up to 4 dwelling units without
+      a minor variance. FSI regulation does not apply to duplex/triplex/fourplex.
+      Height floor of 10.0 m guaranteed regardless of overlay.
+
+  - id: "648-2025"
+    summary: "Updates duplex–fourplex permissions; clarifies lot coverage for multiplexes"
+    affects: [dwelling_unit_count, lot_coverage_pct_max, front_yard_setback_m]
+    scope: citywide
+    in_force: "2025-04-15"
+    consolidated: false
+    details: >
+      Refines the multiplex rules introduced by 474-2023. Clarifies that the existing
+      non-conforming lot coverage regime applies to multiplex conversions of detached homes.
+
+  - id: "654-2025"
+    summary: "Fiveplex/sixplex as-of-right in Toronto–East York and Ward 23"
+    affects: [dwelling_unit_count, building_height_max_m, bedrooms_per_unit_avg]
+    scope: "district:toronto-east-york"
+    in_force: "2025-06-01"
+    consolidated: false
+    details: >
+      Permits 5 or 6 dwelling units as-of-right in residential zones within
+      Toronto–East York district and Ward 23. Height floor 10.5 m for fiveplex/sixplex.
+      Average bedroom cap: 3/unit in 3+ unit buildings; max 8 bedrooms in duplex.
+
+  - id: "223-2025"
+    summary: "Reduces parking minimums near transit and major streets"
+    affects: [parking_spaces_residents, parking_spaces_visitor]
+    scope: citywide
+    in_force: "2025-03-01"
+    consolidated: false
+    details: >
+      Small apartment buildings (≤60 units) on major streets require only 1 visitor space.
+      Multiplex projects (2–6 units) require 0 resident spaces near rapid transit.
+
+  - id: "1116-2025"
+    summary: "Reduces bicycle parking minimum from 0.9 to 0.75 per unit (proposed)"
+    affects: [bicycle_long_term]
+    scope: citywide
+    in_force: null
+    consolidated: false
+    details: >
+      Proposed amendment (not yet in force). Updates Chapter 230 bicycle parking
+      minimums for apartment buildings from 0.9/unit to 0.75/unit.
+
+  - id: "1260-2024"
+    summary: "Mid-rise permissions on Avenues with updated rear transition and angular plane"
+    affects: [angular_plane_rear_active, angular_plane_degrees, avenue_overlay]
+    scope: "district:avenues"
+    in_force: "2024-09-15"
+    consolidated: false
+    details: >
+      Avenues policy updated. Rear angular plane at 45° from 7.5 m setback at
+      10.5 m height on shallow lots; from 7.5 m height on deep lots.
+
+  - id: "1507-2025"
+    summary: "Community streets — reduced vehicular requirements, enhanced pedestrian realm"
+    affects: [driveway_width_m, vehicle_entrance_through_front_wall_allowed]
+    scope: citywide
+    in_force: "2025-07-01"
+    consolidated: false
+
+  - id: "1508-2025"
+    summary: "Home occupation — expanded permitted uses within dwelling units"
+    affects: [multi_tenant_house]
+    scope: citywide
+    in_force: "2025-07-01"
+    consolidated: false
+
+  - id: "1509-2025"
+    summary: "Major streets — updated definitions and setback provisions"
+    affects: [front_yard_setback_m, overlay_policy_areas]
+    scope: citywide
+    in_force: "2025-07-01"
+    consolidated: false
+
+  - id: "58-2026"
+    summary: "Multi-tenant houses — updated licensing and zoning permissions (§150.25)"
+    affects: [multi_tenant_house, secondary_suite]
+    scope: citywide
+    in_force: "2026-01-15"
+    consolidated: false
+
+  - id: "66-2024"
+    summary: "FSI regulation removed for residential zones without 'd' suffix"
+    affects: [fsi_max, multiplex_fsi_exempt]
+    scope: citywide
+    in_force: "2024-04-01"
+    consolidated: false
+    details: >
+      §10.10.40.40(1)(B) now reads 'not limited by this regulation' when no 'd' suffix
+      appears in the zone label. Only lots with an explicit 'd' suffix have an FSI cap.

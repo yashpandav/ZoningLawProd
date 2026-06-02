@@ -1,0 +1,32 @@
+# Core API
+fastapi>=0.111.0
+uvicorn[standard]>=0.29.0
+pydantic>=2.7.0
+python-dotenv>=1.0.0
+PyYAML>=6.0
+
+# AI / embeddings
+openai>=1.30.0
+voyageai>=0.2.3
+fastembed>=0.3.6
+
+# Vector DB
+qdrant-client>=1.9.0
+
+# Relational DB
+asyncpg>=0.29.0
+
+# Geometry pipeline (packgen)
+shapely==2.1.2
+pyproj==3.7.0
+ezdxf==1.4.4
+matplotlib==3.10.0
+reportlab==4.2.5
+numpy>=1.26.0
+ifcopenshell>=0.8.0
+
+# Rate limiting
+slowapi>=0.1.9
+
+# Observability / tracing
+langsmith>=0.1.0

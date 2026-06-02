@@ -1,0 +1,87 @@
+version: "3.9"
+
+# Production stack — Oracle Cloud VM
+# No Qdrant here; vectors live in Qdrant Cloud.
+# Backend binds only to 127.0.0.1:8000; Cloudflare Tunnel connects outbound.
+#
+# Before starting:
+#   1. Run /home/ubuntu/load-secrets.sh to write backend.env from Oracle Vault
+#   2. Restore PostGIS dump (Phase 5.5 in DEPLOYMENT.Md)
+#   3. docker compose -f docker-compose.prod.yml up -d
+
+services:
+
+  postgis:
+    image: postgis/postgis:16-3.4
+    container_name: zoning_postgis
+    restart: always
+    environment:
+      POSTGRES_USER: zoning_user
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: toronto_zoning
+    volumes:
+      - postgis_data:/var/lib/postgresql/data
+    networks:
+      - zoning_internal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U zoning_user -d toronto_zoning"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: zoning_redis
+    restart: always
+    command: redis-server --save 60 1 --loglevel warning --requirepass "${REDIS_PASSWORD}"
+    volumes:
+      - redis_data:/data
+    networks:
+      - zoning_internal
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    image: zoning-backend:latest
+    container_name: zoning_backend
+    restart: always
+    env_file: /home/ubuntu/zoning/backend.env
+    ports:
+      - "127.0.0.1:8000:8000"   # only localhost — Cloudflare Tunnel reaches here
+    networks:
+      - zoning_internal
+    depends_on:
+      postgis:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 90s   # SPLADE model loads on first start (~60s)
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: zoning_tunnel
+    restart: always
+    command: tunnel --config /etc/cloudflared/config.yml run
+    volumes:
+      - /home/ubuntu/.cloudflared:/etc/cloudflared:ro
+    networks:
+      - zoning_internal
+    depends_on:
+      backend:
+        condition: service_healthy
+
+volumes:
+  postgis_data:
+  redis_data:
+
+networks:
+  zoning_internal:
+    driver: bridge

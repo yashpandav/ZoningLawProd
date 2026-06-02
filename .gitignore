@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+
+# Secrets — never commit these
+backend/.env
+.env
+.env.local
+backend.env
+
+# Allow example templates
+!.env.example
+!backend/.env.example
+!frontend/.env.local.example
+
+# Node / Next.js
+frontend/node_modules/
+frontend/.next/
+frontend/build/
+frontend/.vercel
+
+# Data files — loaded separately (geodata.py + ingest.py), not stored in repo
+*.pdf
+*.geojson
+qdrant_storage/
+snapshots/
+
+# OS / editors
+.DS_Store
+Thumbs.db
+*.swp
+*~
+.idea/
+.vscode/

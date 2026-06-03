@@ -12,7 +12,7 @@
 | — | **[Code preparation](#code-preparation-completed)** | ✅ Done | Dockerfile, requirements, LangSmith, CORS, env templates |
 | 0 | **[Pre-flight checks](#phase-0--pre-flight-checks-on-your-local-machine)** | ⬜ Todo | Run before touching Oracle — takes 15 min |
 | 1 | **[Oracle Cloud VM setup](#phase-1--oracle-cloud-vm-setup)** | ⬜ Todo | Create ARM VM, install Docker |
-| 2 | **[Cloudflare setup](#phase-2--cloudflare-setup)** | ⬜ Todo | Tunnel + Access Gate (Google login) |
+| 2 | **[Cloudflare setup](#phase-2--cloudflare-setup)** | ⬜ Todo | Tunnel only — no Access Gate, direct public access |
 | 3 | **[Oracle Vault secrets](#phase-3--secrets-management-with-oracle-vault)** | ⬜ Todo | API keys stored securely, never on disk |
 | 4 | **[Qdrant Cloud + data migration](#phase-4--qdrant-cloud-setup-and-data-migration)** | ⬜ Todo | Upload ~31K vector snapshots |
 | 5 | **[PostGIS data migration](#phase-5--postgis-data-migration-to-oracle-vm)** | ⬜ Todo | Dump → SCP → restore on VM |
@@ -84,12 +84,11 @@ The following code changes were made to make the codebase deployment-ready. No f
 ## Architecture Overview (What You're Building)
 
 ```
-Architect's Browser
+Browser
         │
         ▼
 ┌───────────────────────┐
 │  Cloudflare Edge      │  yashpandav.dev
-│  ├─ Access Gate       │  Google login — only allowed emails
 │  ├─ app.yashpandav.dev│──► Vercel (Next.js, always on, free)
 │  └─ api.yashpandav.dev│──► Cloudflare Tunnel ──► Oracle VM :8000
 └───────────────────────┘
@@ -230,14 +229,14 @@ sudo apt-get update && sudo apt-get install -y cloudflared
 ---
 
 ## Phase 2 — Cloudflare Setup
-*Do this before deploying anything — you need the tunnel token for docker-compose.*
+*Do this before deploying anything — you need the tunnel credentials for docker-compose.*
 
 ### 2.1 Add Your Domain to Cloudflare
 
 1. Go to `dash.cloudflare.com` → Add site → enter `yashpandav.dev`
 2. Cloudflare scans your DNS records
 3. Change your domain nameservers at your registrar to the two Cloudflare nameservers it gives you
-4. Wait 5-30 minutes for propagation
+4. Wait 5–30 minutes for propagation
 5. Confirm: your domain dashboard in Cloudflare shows "Active"
 
 ### 2.2 Create the Tunnel
@@ -245,8 +244,8 @@ sudo apt-get update && sudo apt-get install -y cloudflared
 On your Oracle VM:
 ```bash
 cloudflared tunnel login
-# This prints a URL — open it in your browser, authorize with your Cloudflare account
-# A cert.pem gets saved to ~/.cloudflared/
+# Prints a URL — open it in your browser and authorize with your Cloudflare account
+# A cert.pem is saved to ~/.cloudflared/
 
 cloudflared tunnel create zoning-prod
 # Save the tunnel ID it prints — looks like: a1b2c3d4-xxxx-xxxx-xxxx-xxxxxxxxxxxx
@@ -259,7 +258,7 @@ mkdir -p ~/.cloudflared
 nano ~/.cloudflared/config.yml
 ```
 
-Paste this — replace `YOUR_TUNNEL_ID` with what you got above:
+Paste this — replace `YOUR_TUNNEL_ID` with the ID from above:
 
 ```yaml
 tunnel: YOUR_TUNNEL_ID
@@ -277,30 +276,11 @@ ingress:
 cloudflared tunnel route dns zoning-prod api.yashpandav.dev
 ```
 
-This creates a CNAME in your Cloudflare DNS: `api.yashpandav.dev → your-tunnel-id.cfargotunnel.com`
+This creates a CNAME in Cloudflare DNS: `api.yashpandav.dev → your-tunnel-id.cfargotunnel.com`
 
-For the frontend (`app.yashpandav.dev`), you'll add the DNS record after deploying to Vercel in Phase 5.
+For the frontend (`app.yashpandav.dev`), you'll add the DNS record after deploying to Vercel in Phase 8.
 
-### 2.5 Set Up Cloudflare Access
-
-Go to `one.dash.cloudflare.com` → Access → Applications → Add an application.
-
-**Application 1 — Protect the API:**
-- Type: Self-hosted
-- Application name: Zoning API
-- Subdomain: `api`, Domain: `yashpandav.dev`
-- Session duration: 24 hours
-
-**Access Policy:**
-- Policy name: Allow Testers
-- Action: Allow
-- Rule: Emails → add `architect@theiremail.com` and `your@email.com`
-
-**Application 2 — Protect the Frontend:**
-- Same settings but subdomain: `app`
-- Same policy, same emails
-
-Now both `api.yashpandav.dev` and `app.yashpandav.dev` require a Google login before showing anything. The architect gets a one-click login experience.
+> **No Cloudflare Access needed.** The tunnel exposes the API directly — anyone with the URL can reach it. If you want to restrict access later you can add an nginx basic-auth layer on the VM or use Cloudflare's free IP allowlist rules (no card required), but for now the app is publicly reachable at `https://api.yashpandav.dev`.
 
 ---
 
@@ -757,17 +737,16 @@ From your local machine (not the VM):
 curl https://api.yashpandav.dev/api/health
 ```
 
-If Cloudflare Access is blocking it (returning an HTML login page), that's correct — it means the gate is working. To test without the gate temporarily, add your own IP to an Access bypass rule.
+Expected: same JSON health response as the local curl above. If you get a 502 or connection error, check `docker compose logs cloudflared` on the VM — the tunnel may still be starting.
 
 ### 9.4 Test the Full User Flow
 
 1. Open `https://app.yashpandav.dev` in a private browser window
-2. Cloudflare prompts for Google login — sign in with your email
-3. The map loads
-4. Click a parcel — parcel data populates the right panel
-5. Type a Quick mode question — answer streams back
-6. Switch to Analysis mode — test a multi-turn conversation
-7. Check LangSmith — you should see the traces appearing live
+2. The map loads directly — no login required
+3. Click a parcel — parcel data populates the right panel
+4. Type a Quick mode question — answer streams back
+5. Switch to Analysis mode — test a multi-turn conversation
+6. Check LangSmith — you should see the traces appearing live
 
 ---
 
@@ -827,23 +806,22 @@ Now if Oracle reboots your VM, all containers come back up automatically within 
 | Phase | Time |
 |-------|------|
 | Oracle VM setup | 30 min |
-| Cloudflare domain + tunnel + access | 30 min |
+| Cloudflare domain + tunnel | 20 min |
 | Oracle Vault secrets | 20 min |
 | Qdrant Cloud snapshot upload | 30 min (+ transfer time) |
 | PostGIS dump + transfer + restore | 30-60 min (depends on data size) |
 | Docker build + push + pull | 20 min |
 | Vercel frontend deploy | 10 min |
 | Final launch + verification | 20 min |
-| **Total** | **~3.5 to 4.5 hours** |
+| **Total** | **~3 to 4 hours** |
 
 ---
 
 ## What to Share With the Architect
 
-One email, three things:
+One message, two things:
 
 1. **URL:** `https://app.yashpandav.dev`
-2. **Login:** Click the Google login prompt — use your Google account (I've whitelisted `architect@email.com`)
-3. **What to test:** The map, Quick mode chat, and Analysis mode chat for any Toronto property
+2. **What to test:** The map, Quick mode chat, and Analysis mode chat for any Toronto property
 
-That's the entire user-facing setup. No app to install, no API keys to manage, no instructions beyond "click a property and ask questions."
+That's it. No login, no app to install, no API keys to manage — just open the URL and start clicking parcels.
